@@ -12,7 +12,7 @@ function App() {
       setError('');
       const data = await getWeather(city);
       setWeather(data);
-    } catch (err) {
+    } catch {
       setWeather(null);
       setError('Não foi possível buscar o clima. Verifique a cidade.');
     }

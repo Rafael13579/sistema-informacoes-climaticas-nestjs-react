@@ -55,4 +55,52 @@ export class WeatherService {
       );
     }
   }
+
+  async getForecast(city: string, days: 5): Promise<any> {
+    const apiKey = this.configService.get<string>('WEATHER_API_KEY');
+
+    if (!apiKey) {
+      this.logger.error('API key for weather service is not configured.');
+      throw new HttpException(
+        'Weather API key not configured',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const baseUrl = `http://api.weatherapi.com/v1/forecast.json`;
+
+    const params = new URLSearchParams({
+      key: apiKey,
+      q: city,
+      days: days.toString(),
+      Lang: 'pt',
+    });
+
+    const url = `${baseUrl}?${params.toString()}`;
+
+    try {
+      this.logger.log(`Fetching weather forecast for city: ${city}`);
+      const res: Response = await fetch(url);
+      const data: WeatherApiResponse = (await res.json()) as WeatherApiResponse;
+
+      if (data.error) {
+        this.logger.warn(`Falha na api externa: ${data.error.message}`);
+        throw new HttpException(
+          `Erro ao buscar previsão do tempo: ${data.error.message}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      this.logger.error(`Erro inesperado: ${error}`);
+      throw new HttpException(
+        'Serviço de clima indisponível no momento',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+  }
 }

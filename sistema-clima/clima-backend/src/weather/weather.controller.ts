@@ -10,4 +10,9 @@ export class WeatherController {
   getWeather(@Query() query: GetWeatherDto) {
     return this.weatherService.getWeather(query.city);
   }
+
+  @Get('forecast')
+  getForecast(@Query() query: GetWeatherDto) {
+    return this.weatherService.getForecast(query.city, 5);
+  }
 }

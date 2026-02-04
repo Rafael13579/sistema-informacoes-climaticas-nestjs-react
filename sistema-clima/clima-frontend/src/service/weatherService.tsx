@@ -12,12 +12,12 @@ export async function getWeather(city: string): Promise<Weather> {
     const data = await response.json();
 
     return {
-        city: data.city,
-        country: data.country,
-        temperature: data.temperature,
-        feelsLike: data.feelsLike,
-        humidity: data.humidity,
-        windSpeed: data.windSpeed,
-        condition: data.condition,
+        city: data.location.name,
+        country: data.location.country,
+        temperature: data.current.temp_c,
+        feelsLike: data.current.feelslike_c,
+        humidity: data.current.humidity,
+        windSpeed: data.current.wind_kph,
+        condition: data.current.condition.text,
     }
 }
