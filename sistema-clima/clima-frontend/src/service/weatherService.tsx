@@ -33,7 +33,7 @@ type ForecastApiDay = {
   };
 };
 
-async function fetchForecast(city: string): Promise<Forecast> {
+export async function fetchForecast(city: string): Promise<Forecast> {
     const url = `http://localhost:3000/weather/forecast?city=${city}&days=5`;
     const res = await fetch(url);
 
