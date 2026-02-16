@@ -1,81 +1,161 @@
-import { useState } from 'react';
-import { getWeather, fetchForecast } from './service/weatherService';
-import type { Weather } from './types/Weather';
-import type { Forecast } from './types/Forecast';
-import { WeatherCard } from './components/WeatherCard';
-import { ForecastCard } from './components/ForecastCard';
+import { useEffect, useState } from "react";
+import "./App.css";
+import { getWeather, fetchForecast } from "./service/weatherService";
+import type { Weather } from "./types/Weather";
+import type { Forecast } from "./types/Forecast";
+import { SearchBar } from "./components/SearchBar";
+import { WeatherSection } from "./components/WeatherSection";
+import { ForecastSection } from "./components/ForecastSection";
+import { HourlyForecast } from "./components/HourlyForecast";
 
-function App() {
-  const [city, setCity] = useState('');
+export default function App() {
+  const [city, setCity] = useState("");
   const [weather, setWeather] = useState<Weather | null>(null);
   const [forecast, setForecast] = useState<Forecast | null>(null);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  async function handleSearch() {
+  const getWeatherTheme = () => {
+    if (!weather) return { background: "app-default"};
+
+    const conditionText = weather.condition.toLowerCase();
+
+    // --- SOL ---
+    if (
+      conditionText.includes("sunny") ||
+      conditionText.includes("clear") ||
+      conditionText.includes("sol") ||
+      conditionText.includes("limpo")
+    ) {
+      return { background: "app-sunny" };
+    }
+
+    // --- NUBLADO ---
+    if (
+      conditionText.includes("cloud") ||
+      conditionText.includes("overcast") ||
+      conditionText.includes("mist") ||
+      conditionText.includes("fog") ||
+      conditionText.includes("nublado") ||
+      conditionText.includes("encoberto") ||
+      conditionText.includes("nuvens")
+    ) {
+      return { background: "app-cloudy" };
+    }
+
+    if (
+      conditionText.includes("rain") ||
+      conditionText.includes("drizzle") ||
+      conditionText.includes("shower") ||
+      conditionText.includes("chuva") ||
+      conditionText.includes("garoa") ||
+      conditionText.includes("chuvisco")
+    ) {
+      return { background: "app-rainy" };
+    }
+
+    if (
+      conditionText.includes("snow") ||
+      conditionText.includes("ice") ||
+      conditionText.includes("blizzard") ||
+      conditionText.includes("nevoeiro") ||
+      conditionText.includes("neve")
+    ) {
+      return { background: "app-snow" };
+    }
+
+    if (
+      conditionText.includes("thunder") ||
+      conditionText.includes("storm") ||
+      conditionText.includes("tempestade") ||
+      conditionText.includes("trovoada")
+    ) {
+      return { background: "app-storm" };
+    }
+
+    return { background: "app-default" };
+  };
+
+  const { background } = getWeatherTheme();
+
+   async function handleSearch() {
+    if (!city) return;
+    setLoading(true);
     try {
-      setError('');
-      const data = await getWeather(city);
-      setWeather(data);
-      setForecast(null);
-    } catch {
-      setWeather(null);
-      setError('Não foi possível buscar o clima. Verifique a cidade.');
+      const [weatherData, forecastData] = await Promise.all([
+        getWeather(city),
+        fetchForecast(city)
+      ]);
+      
+      setWeather(weatherData);
+      setForecast(forecastData);
+    } catch (error) {
+      alert("Erro ao buscar clima.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function handleFetchForecast() {
-    try {
-      setError('');
-      const data = await fetchForecast(city);
-      setForecast(data);
-    } catch {
-      setForecast(null);
-      setError('Não foi possível buscar a previsão. Verifique a cidade.');
-    }
-  }
+
+  useEffect(() => {
+    const loadFullData = async (query: string) => {
+      setLoading(true);
+      try {
+        const [weatherData, forecastData] = await Promise.all([
+          getWeather(query),
+          fetchForecast(query)
+        ]);
+
+        setWeather(weatherData);
+        setForecast(forecastData);
+        setCity(weatherData.city);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const loadUserLocation = () => {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            loadFullData(`${lat},${lon}`);
+          },
+          (error) => {
+            console.warn("Geolocalização negada ou erro:", error);
+            loadFullData("Lisboa"); 
+          }
+        );
+      } else {
+        loadFullData("Lisboa");
+      }
+    };
+
+    loadUserLocation();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 flex flex-col items-center px-4 py-10">
-      <h1 className="text-3xl sm:text-4xl font-bold text-white mb-8">
-        Sistema de Informações Climáticas 🌤️
-      </h1>
-
-      <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 w-full max-w-md flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Digite o nome da cidade"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+    <div className={`container ${background}`}>
+      
+        <SearchBar
+          city={city}
+          setCity={setCity}
+          onSearch={handleSearch}
         />
 
-        <div className="flex gap-2">
-          <button
-            onClick={handleSearch}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
-          >
-            Buscar Clima
-          </button>
+        <WeatherSection weather={weather} loading={loading} />
 
-          <button
-            onClick={handleFetchForecast}
-            className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 rounded-lg transition"
-          >
-            Ver Previsão
-          </button>
-        </div>
-
-        {error && (
-          <p className="text-red-600 text-center font-medium">{error}</p>
+        {forecast && (
+           <HourlyForecast hours={forecast.hourly} />
         )}
-      </div>
 
-      <div className="mt-10 flex flex-col items-center gap-8 w-full">
-        {weather && <WeatherCard weather={weather} />}
-        {forecast && <ForecastCard forecast={forecast} />}
-      </div>
+        <ForecastSection
+          forecast={forecast}
+          loading={loading}
+        />
     </div>
   );
 }
-
-export default App;

@@ -1,24 +1,29 @@
-import type { Weather } from '../types/Weather';
+import type { Weather } from "../types/Weather";
 
-interface WeatherCardProps {
+type WeatherCardProps = {
   weather: Weather;
 }
 
 export function WeatherCard({ weather }: WeatherCardProps) {
   return (
-    <div className="bg-white/80 backdrop-blur rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-      <h2 className="text-2xl font-bold mb-2">
+    <div className="weather-section" style={{ textAlign: "center" }}>
+      <h2>
         {weather.city}, {weather.country}
       </h2>
+      <p style={{
+        fontSize: "50px",
+        fontWeight: "bold",
+        margin: "20px 0"
+      }}>{weather.temperature}°C</p>
 
-      <p className="text-5xl font-semibold mb-4">{weather.temperature}°C</p>
+      <div style={{ fontSize: "4rem", marginTop: "15px" }}>
+        <img src={weather.icon} alt={weather.condition} style={{ width: "120px", height: "120px" }} />
+      </div>
 
-      <p className="text-gray-700 mb-1">
-        Sensação térmica: {weather.feelsLike}°C
-      </p>
-      <p className="text-gray-700 mb-1">Condição: {weather.condition}</p>
-      <p className="text-gray-700 mb-1">Umidade: {weather.humidity}%</p>
-      <p className="text-gray-700">Vento: {weather.windSpeed} km/h</p>
+      <p>Sensação térmica: {weather.feelsLike}°C</p>
+      <p>Condição: {weather.condition}</p>
+      <p>Umidade: {weather.humidity}%</p>
+      <p>Vento: {weather.windSpeed} km/h</p>
     </div>
   );
 }
