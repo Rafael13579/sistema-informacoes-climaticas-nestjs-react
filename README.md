@@ -7,8 +7,8 @@
 
 Um aplicativo web moderno e responsivo para previsão do tempo, focado na experiência do usuário e em uma interface limpa. 
 
-![Screenshot do Projeto](./ProjetoSistemaDeInformaçõesClimáticas/sistema-clima/clima-frontend/public/screenshots/captura-tela1.png)
-![Screenshot do Projeto](./ProjetoSistemaDeInformaçõesClimáticas/sistema-clima/clima-frontend/public/screenshots/captura-tela2.png)
+![Screenshot do Projeto](sistema-clima/clima-frontend/public/screenshots/captura-tela1.png)
+![Screenshot do Projeto](sistema-clima/clima-frontend/public/screenshots/captura-tela2.png)
 
 
 O sistema consome dados de uma API externa através de um backend próprio, garantindo segurança e flexibilidade, e apresenta informações detalhadas como clima atual, previsão horária para as próximas 24 horas e previsão estendida para 3 dias.
