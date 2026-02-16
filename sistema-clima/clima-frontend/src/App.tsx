@@ -37,6 +37,7 @@ export default function App() {
       conditionText.includes("fog") ||
       conditionText.includes("nublado") ||
       conditionText.includes("encoberto") ||
+      conditionText.includes("nevoeiro") ||
       conditionText.includes("nuvens")
     ) {
       return { background: "app-cloudy" };
@@ -57,7 +58,6 @@ export default function App() {
       conditionText.includes("snow") ||
       conditionText.includes("ice") ||
       conditionText.includes("blizzard") ||
-      conditionText.includes("nevoeiro") ||
       conditionText.includes("neve")
     ) {
       return { background: "app-snow" };
